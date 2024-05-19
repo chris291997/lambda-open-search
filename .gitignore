@@ -1,12 +1,13 @@
 node_modules
 temp
-temptisan.ts
+template
 
 # .env
 .idea
 .build
 serverless copy.yml
 .serverless
+
 # .warmup
 #ONGOING
 # resources.yml
