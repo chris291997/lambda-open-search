@@ -51,7 +51,7 @@ provider:
   environment:
     PROFILE: ${opt:profile, 'default'}
     REGION: us-west-2
-    SERVICE_NAME: brad-api
+    SERVICE_NAME: serverless-api
     ROLE_ARN: arn:aws:iam::294595581126:role/test_deployer
     STAGE: dev
     # TABLE_NAME: brad

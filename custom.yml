@@ -29,17 +29,16 @@ S3_BUCKET: ${env:S3_BUCKET}
 #CARBON
 CARBON_TIMEZONE: ${env:CARBON_TIMEZONE}
 
-# warmup:
-#   default:
-#     folderName: '.warmup'
-#     pathFile: './warmup/index.js'
-#     cleanFolder: false
-#     memorySize: 256
-#     name: ${env:SERVICE_NAME}-${env:STAGE}-warmer
-#     enabled: true
-#     concurrency: 10
-#     package:
-#       individually: false
+warmup:
+  default:
+    folderName: '.warmup'
+    cleanFolder: false
+    memorySize: 256
+    name: ${env:SERVICE_NAME}-${env:STAGE}-warmer
+    enabled: true
+    concurrency: 10
+    package:
+      individually: false
 
 ACCESS_TOKEN_AUTHORIZE:
   name: access_token_authorization
