@@ -40,16 +40,16 @@ CARBON_TIMEZONE: ${env:CARBON_TIMEZONE}
 #     package:
 #       individually: false
 
-ACCESS_TOKEN_AUTHORIZE:
-  name: access_token_authorization
-  resultTtlInSeconds: 0
-  type: TOKEN
-  identitySource: method.request.header.Authorization
-  identityValidationExpression: Bearer (.*)
+# ACCESS_TOKEN_AUTHORIZE:
+#   name: access_token_authorization
+#   resultTtlInSeconds: 0
+#   type: TOKEN
+#   identitySource: method.request.header.Authorization
+#   identityValidationExpression: Bearer (.*)
 
-REFRESH_TOKEN_AUTHORIZE:
-  name: refresh_token_authorization
-  resultTtlInSeconds: 0
-  type: TOKEN
-  identitySource: method.request.header.Authorization
-  identityValidationExpression: Bearer (.*)
+# REFRESH_TOKEN_AUTHORIZE:
+#   name: refresh_token_authorization
+#   resultTtlInSeconds: 0
+#   type: TOKEN
+#   identitySource: method.request.header.Authorization
+#   identityValidationExpression: Bearer (.*)
