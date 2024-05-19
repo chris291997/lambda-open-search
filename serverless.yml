@@ -43,14 +43,14 @@ provider:
   timeout: 30 # optional, in seconds, default is 6
   iam:
     role: arn:aws:iam::294595581126:role/test_deployer
-  region: ap-southeast-1
+  region: us-west-2
   stage: ${opt:stage, 'dev'}
   profile: ${opt:profile, 'default'}
   tags:
-    Project: Brad
+    Project: serverless
   environment:
     PROFILE: ${opt:profile, 'default'}
-    REGION: ap-southeast-1
+    REGION: us-west-2
     SERVICE_NAME: brad-api
     ROLE_ARN: arn:aws:iam::294595581126:role/test_deployer
     STAGE: dev
