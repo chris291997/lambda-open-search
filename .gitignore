@@ -7,6 +7,6 @@ temptisan.ts
 .build
 serverless copy.yml
 .serverless
-.warmup
+# .warmup
 #ONGOING
 # resources.yml
