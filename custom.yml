@@ -32,6 +32,7 @@ CARBON_TIMEZONE: ${env:CARBON_TIMEZONE}
 warmup:
   default:
     folderName: '.warmup'
+    pathFile: './warmup/index.js'
     cleanFolder: false
     memorySize: 256
     name: ${env:SERVICE_NAME}-${env:STAGE}-warmer
