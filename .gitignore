@@ -1,0 +1,13 @@
+node_modules
+temp
+temptisan.ts
+
+# .env
+.idea
+.build
+serverless copy.yml
+.serverless
+.warmup
+.env
+#ONGOING
+# resources.yml

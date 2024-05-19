@@ -1,0 +1,93 @@
+# AUTHOR           : Chris Benosa
+# DATE             : 28/12/2021
+# IMPORTANT NOTE   : "Please do not change anything to this file.  c/o author"
+
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: serverless-api
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-plugin-typescript
+  - serverless-offline
+  - serverless-plugin-warmup
+  - serverless-api-compression
+# app and org for use with dashboard.serverless.com
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+useDotenv: true
+provider:
+  logs:
+    restApi: true
+  tracing:
+    apiGateway: true
+    lambda: true
+  name: aws
+  runtime: nodejs14.x
+  versionFunctions: false
+  endpointType: REGIONAL
+  memorySize: 128 # optional, in MB, default is 1024
+  timeout: 30 # optional, in seconds, default is 6
+  iam:
+    role: arn:aws:iam::808249705822:role/service-role/brad_deployer
+  region: ap-southeast-1
+  stage: ${opt:stage, 'dev'}
+  profile: ${opt:profile, 'default'}
+  tags:
+    Project: Brad
+  environment:
+    PROFILE: ${opt:profile, 'default'}
+    REGION: ap-southeast-1
+    SERVICE_NAME: brad-api
+    ROLE_ARN: arn:aws:iam::808249705822:role/service-role/brad_deployer
+    STAGE: dev
+    # TABLE_NAME: brad
+    # PAGE_LIMIT: 50
+  # vpc: # Optional VPC. But if you use VPC then both subproperties (securityGroupIds and subnetIds) are required
+  #   securityGroupIds:
+  #     - ${self:custom.SECURITY_GRP}
+  #   subnetIds:
+  #     - ${self:custom.SUBNET_01}
+  #     - ${self:custom.SUBNET_02}
+
+# you can add packaging information here
+package:
+  patterns:
+    - docs/*
+    - code_templates/*
+    - environment/*
+    - events/*
+    - migrations/*
+    - tests/*
+    - .env.example
+    - .eslintrc.js
+    - .prettierrc
+    - buildspec.yml
+    - custom.yml
+    - docker-compose.yml
+    - package.json
+    - package-lock.json
+    - resources.yml
+    - serverless.yml
+    - tsconfig.json
+
+functions: ${file(./src/functions/apis/apiHandler.yml)}
+
+custom: ${file(./custom.yml)}
+resources: ${file(./resources.yml)}
+
+
+

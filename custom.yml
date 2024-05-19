@@ -1,0 +1,55 @@
+# AUTHOR           : Chris Benosa
+# DATE             : 28/12/2021
+# IMPORTANT NOTE   : "Please do not change anything to this file.  c/o author"
+
+
+PROJECT_NAME: ${env:PROJECT_NAME}
+SERVICE_NAME: ${env:SERVICE_NAME}
+
+# ENVIRONMENT
+STAGE: ${env:STAGE}
+REGION: ${env:REGION}
+ROLE_ARN: ${env:ROLE_ARN}
+API_SECRET: ${env:API_SECRET}
+
+# SECURITY
+SECURITY_GRP: ${env:SECURITY_GRP}
+SUBNET_01: ${env:SUBNET_01}
+SUBNET_02: ${env:SUBNET_02}
+
+
+#S3
+S3_REGION: ${env:S3_REGION}
+S3_BUCKET: ${env:S3_BUCKET}
+
+#DYNAMODB
+# TABLE_NAME: ${env:TABLE_NAME}
+# PAGE_LIMIT: ${env:PAGE_LIMIT}
+
+#CARBON
+CARBON_TIMEZONE: ${env:CARBON_TIMEZONE}
+
+warmup:
+  default:
+    folderName: '.warmup'
+    cleanFolder: false
+    memorySize: 256
+    name: ${env:SERVICE_NAME}-${env:STAGE}-warmer
+    enabled: true
+    concurrency: 10
+    package:
+      individually: false
+
+ACCESS_TOKEN_AUTHORIZE:
+  name: access_token_authorization
+  resultTtlInSeconds: 0
+  type: TOKEN
+  identitySource: method.request.header.Authorization
+  identityValidationExpression: Bearer (.*)
+
+REFRESH_TOKEN_AUTHORIZE:
+  name: refresh_token_authorization
+  resultTtlInSeconds: 0
+  type: TOKEN
+  identitySource: method.request.header.Authorization
+  identityValidationExpression: Bearer (.*)
