@@ -36,7 +36,7 @@ provider:
     apiGateway: true
     lambda: true
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs20.x
   versionFunctions: false
   endpointType: REGIONAL
   memorySize: 128 # optional, in MB, default is 1024

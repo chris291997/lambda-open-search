@@ -52,7 +52,6 @@ async function generate() {
         paths = addPath(row.key, row.tag, row.method, row.summary, row.parameters, row.responses, paths);
     }
 
-    YAML.scalarOptions.str.defaultType = Type.QUOTE_DOUBLE;
     const swagger = YAML.stringify(
         {
             openapi: OPENAPI,
@@ -62,10 +61,7 @@ async function generate() {
             components: {
                 schemas: definitions,
             },
-        },
-        {
-            simpleKeys: true,
-        },
+        }
     );
 
     fs.writeFile(path.join(__dirname, 'swagger.yml'), swagger, function (err) {
