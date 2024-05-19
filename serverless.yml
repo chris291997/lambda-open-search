@@ -42,7 +42,7 @@ provider:
   memorySize: 128 # optional, in MB, default is 1024
   timeout: 30 # optional, in seconds, default is 6
   iam:
-    role: arn:aws:iam::808249705822:role/service-role/brad_deployer
+    role: arn:aws:iam::294595581126:role/test_deployer
   region: ap-southeast-1
   stage: ${opt:stage, 'dev'}
   profile: ${opt:profile, 'default'}
@@ -52,7 +52,7 @@ provider:
     PROFILE: ${opt:profile, 'default'}
     REGION: ap-southeast-1
     SERVICE_NAME: brad-api
-    ROLE_ARN: arn:aws:iam::808249705822:role/service-role/brad_deployer
+    ROLE_ARN: arn:aws:iam::294595581126:role/test_deployer
     STAGE: dev
     # TABLE_NAME: brad
     # PAGE_LIMIT: 50

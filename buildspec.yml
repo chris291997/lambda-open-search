@@ -12,7 +12,7 @@ phases:
       - ASSUME_ROLE_ARN=${DEPLOY_ROLE}
       - echo $ASSUME_ROLE_ARN
       - aws sts get-caller-identity 
-      - TEMP_ROLE=`aws sts assume-role --role-arn $ASSUME_ROLE_ARN --role-session-name brad-sls-api` 
+      - TEMP_ROLE=`aws sts assume-role --role-arn $ASSUME_ROLE_ARN --role-session-name serverless-api` 
       - export TEMP_ROLE 
       # - echo $TEMP_ROLE
       # - TEMP_ROLE=`aws sts assume-role --role-arn $ASSUME_ROLE_ARN --role-session-name brad_deployer`
@@ -23,7 +23,7 @@ phases:
       - export AWS_ACCESS_PROFILE="TEMP_AWS_PROFILE"
       # - mkdir ~/.npm-global
       # - npm config set prefix '~/.npm-global'
-      - npm install -g serverless@2.43.1 --unsafe && npm install --production
+      - npm install -g serverless@3.38.0 --unsafe && npm install --production
       - AWS_CREDENTIAL_FILE=~/.aws/credentials
       - mkdir ~/.aws
       - touch $AWS_CREDENTIAL_FILE
@@ -47,8 +47,8 @@ phases:
       - echo $DEST_FILENAME
   build:
     commands:
-      - serverless deploy --stage $STAGE --aws-profile $AWS_ACCESS_PROFILE --region $REGION --config serverless-corpo.yml
-      - serverless deploy --stage $STAGE --aws-profile $AWS_ACCESS_PROFILE --region $REGION --config serverless-admin.yml
+      - serverless deploy --stage $STAGE --aws-profile $AWS_ACCESS_PROFILE --region $REGION --config serverless.yml
+      # - serverless deploy --stage $STAGE --aws-profile $AWS_ACCESS_PROFILE --region $REGION --config serverless-admin.yml
   post_build:
     commands:
       - npm install aws-sdk
