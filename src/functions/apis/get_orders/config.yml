@@ -10,6 +10,6 @@ orders_list:
   tracing: PassThrough 
   description: display a test item from orders
   #warmup enabled
-  warmup:
-    default:
-      enabled: true
+  # warmup:
+  #   default:
+  #     enabled: true
