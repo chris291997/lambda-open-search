@@ -67,12 +67,11 @@ provider:
 package:
   individually: true
   patterns:
-    - '!**/node_modules/**'
     - '!environment/**'
     - '!events/**'
     - '!migrations/**'
     - '!tests/**'
-    - '!.env.example'
+    - '!.env.copy'
     - '!.eslintrc.js'
     - '!.prettierrc'
     - '!buildspec.yml'
