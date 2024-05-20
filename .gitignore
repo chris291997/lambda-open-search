@@ -1,12 +1,17 @@
-node_modules
+
+# Ignore node_modules directory
+node_modules/
 environment
-serverless_events.yml
-serverless_crons.yml
-# .env
-# .env.example
-.idea
-.build
-.vscode
-envcopy
-dynamodb_migration.ts
+# Ignore .env files
+.env.copy
+
+# Ignore .build directory
+.build/
+
+# Ignore .vscode directory
+.vscode/
+
+# Ignore .idea directory
+.idea/
+
 src/libs/Notification.ts

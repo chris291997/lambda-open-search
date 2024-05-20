@@ -1,1 +1,0 @@
-ts-node invent.ts construct:api  - this will automatically create a new directory within src/functions/apis based from the name given on the command
