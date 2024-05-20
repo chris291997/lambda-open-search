@@ -1,2 +1,0 @@
-refresh_token_authorization:
-  handler: src/functions/middlewares/refresh_token_authorization/handler.execute

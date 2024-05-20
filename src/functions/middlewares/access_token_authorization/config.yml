@@ -1,2 +1,0 @@
-access_token_authorization:
-  handler: src/functions/middlewares/access_token_authorization/handler.execute
