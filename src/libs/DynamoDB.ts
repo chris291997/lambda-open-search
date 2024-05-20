@@ -1,4 +1,4 @@
-import * as DynamoDB from 'aws-sdk/clients/dynamodb';
+import DynamoDB from 'aws-sdk/clients/dynamodb';
 import * as AWS from 'aws-sdk';
 import { DataMapper } from '@aws/dynamodb-data-mapper';
 
