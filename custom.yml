@@ -53,3 +53,8 @@ CARBON_TIMEZONE: ${env:CARBON_TIMEZONE}
 #   type: TOKEN
 #   identitySource: method.request.header.Authorization
 #   identityValidationExpression: Bearer (.*)
+
+prune:
+  automatic: true
+  includeLayers: true
+  number: 5

@@ -22,6 +22,7 @@ plugins:
   - serverless-offline
   # - serverless-plugin-warmup
   - serverless-api-compression
+  - serverless-prune-plugin
 # app and org for use with dashboard.serverless.com
 
 # You can pin your service to only deploy with a specific Serverless version
@@ -79,6 +80,9 @@ package:
     - node_modules/**/.git/**  # Exclude .git directories
     - node_modules/**/.github/**  # Exclude .github directories
     - node_modules/**/.husky/**  # Exclude .husky directories (git hooks)
+    - .build/*
+    - .vscode/*
+    - .git/*
     - environment/*
     - events/*
     - migrations/*
