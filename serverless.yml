@@ -65,8 +65,9 @@ provider:
 
 # you can add packaging information here
 package:
-  # individually: true
+  individually: true
   patterns:
+    - '!**/node_modules/**'
     - '!environment/**'
     - '!events/**'
     - '!migrations/**'
@@ -82,6 +83,7 @@ package:
     - '!resources.yml'
     - '!serverless.yml'
     - '!tsconfig.json'
+
 
 functions: ${file(./src/functions/apis/apiHandler.yml)}
 
