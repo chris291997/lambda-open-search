@@ -1,16 +1,23 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "preserveConstEnums": true,
-    "strictNullChecks": true,
-    "sourceMap": true,
-    "allowJs": true,
-    "module": "es2015",
-    "target": "es2017",
-    "outDir": ".build",
-    "moduleResolution": "node",
-    "lib": ["es2017"],
-    "rootDir": "./",
-    "emitDecoratorMetadata": true
-  }
+    "target": "ES2017", // Target ECMAScript 2017
+    "module": "CommonJS", // Use CommonJS modules for Node.js
+    "strict": true, // Enable strict type-checking options
+    "esModuleInterop": true, // Enable interoperability between CommonJS and ES Modules
+    "forceConsistentCasingInFileNames": true, // Ensure consistent casing of filenames
+    "moduleResolution": "node", // Use Node.js resolution strategy for module resolution
+    "resolveJsonModule": true, // Enable importing of JSON modules
+    "sourceMap": true, // Generate source maps for better debugging
+    "outDir": ".build", // Output directory for compiled files
+    "rootDir": "./", // Root directory of input files
+    "declaration": true, // Generate corresponding .d.ts files
+    "emitDecoratorMetadata": true, // Emit design-type metadata for decorated declarations in source
+    "experimentalDecorators": true // Enable experimental support for decorators
+  },
+  "include": [
+    "src/**/*.ts" // Include TypeScript files in the src directory
+  ],
+  "exclude": [
+    "node_modules" // Exclude node_modules directory from compilation
+  ]
 }

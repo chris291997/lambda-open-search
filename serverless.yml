@@ -67,19 +67,6 @@ provider:
 # you can add packaging information here
 package:
   exclude:
-    - node_modules/**/*.md  # Exclude Markdown files
-    - node_modules/**/*.txt  # Exclude text files
-    - node_modules/**/*.tgz  # Exclude tarballs
-    - node_modules/**/test/**  # Exclude test directories
-    - node_modules/**/tests/**  # Exclude tests directories
-    - node_modules/**/examples/**  # Exclude examples directories
-    - node_modules/**/docs/**  # Exclude docs directories
-    - node_modules/**/.cache/**  # Exclude cache directories
-    - node_modules/**/.bin/**  # Exclude binary directories
-    - node_modules/**/nyc/**  # Exclude nyc (code coverage) directories
-    - node_modules/**/.git/**  # Exclude .git directories
-    - node_modules/**/.github/**  # Exclude .github directories
-    - node_modules/**/.husky/**  # Exclude .husky directories (git hooks)
     - .build/*
     - .vscode/*
     - .git/*
