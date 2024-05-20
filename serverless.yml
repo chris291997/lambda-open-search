@@ -66,8 +66,6 @@ provider:
 # you can add packaging information here
 package:
   exclude:
-    - docs/*
-    - code_templates/*
     - environment/*
     - events/*
     - migrations/*
@@ -75,11 +73,9 @@ package:
     - .env.example
     - .eslintrc.js
     - .prettierrc
-    - artisan.ts
     - buildspec.yml
     - custom.yml
     - docker-compose.yml
-    - migrations.js
     - package.json
     - package-lock.json
     - resources.yml
