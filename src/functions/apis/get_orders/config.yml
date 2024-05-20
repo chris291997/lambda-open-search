@@ -7,7 +7,6 @@ orders_list:
         cors: true
   
         # authorizer: ${self:custom.ACCESS_TOKEN_AUTHORIZE}
-  tracing: PassThrough 
   description: display a test item from orders
   #warmup enabled
   # warmup:
