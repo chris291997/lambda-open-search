@@ -65,10 +65,8 @@ provider:
 
 # you can add packaging information here
 package:
-  individually: true
+  # individually: true
   patterns:
-    - '!docs/**'
-    - '!code_templates/**'
     - '!environment/**'
     - '!events/**'
     - '!migrations/**'
