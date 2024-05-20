@@ -1,11 +1,12 @@
 node_modules
-.idea
+environment
+serverless_events.yml
+serverless_crons.yml
 # .env
+# .env.example
 .idea
 .build
-serverless copy.yml
-.serverless
-
-# .warmup
-#ONGOING
-# resources.yml
+.vscode
+envcopy
+dynamodb_migration.ts
+src/libs/Notification.ts
