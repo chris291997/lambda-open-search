@@ -65,23 +65,26 @@ provider:
 
 # you can add packaging information here
 package:
-  individually: true
-  patterns:
-    - '!environment/**'
-    - '!events/**'
-    - '!migrations/**'
-    - '!tests/**'
-    - '!.env.copy'
-    - '!.eslintrc.js'
-    - '!.prettierrc'
-    - '!buildspec.yml'
-    - '!custom.yml'
-    - '!docker-compose.yml'
-    - '!package.json'
-    - '!package-lock.json'
-    - '!resources.yml'
-    - '!serverless.yml'
-    - '!tsconfig.json'
+  exclude:
+    - docs/*
+    - code_templates/*
+    - environment/*
+    - events/*
+    - migrations/*
+    - tests/*
+    - .env.example
+    - .eslintrc.js
+    - .prettierrc
+    - artisan.ts
+    - buildspec.yml
+    - custom.yml
+    - docker-compose.yml
+    - migrations.js
+    - package.json
+    - package-lock.json
+    - resources.yml
+    - serverless.yml
+    - tsconfig.json
 
 
 functions: ${file(./src/functions/apis/apiHandler.yml)}
