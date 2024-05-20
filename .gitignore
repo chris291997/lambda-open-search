@@ -1,10 +1,12 @@
 
 # Ignore node_modules directory
 node_modules/
+invent.ts
 environment
-# Ignore .env files
-.env.copy
 
+# Ignore .env files
+
+.env.copy
 # Ignore .build directory
 .build/
 
@@ -14,4 +16,6 @@ environment
 # Ignore .idea directory
 .idea/
 
+
+dynamodb_migration.ts
 src/libs/Notification.ts
