@@ -25,7 +25,7 @@ phases:
       - echo "aws_session_token=${AWS_SESSION_TOKEN}" >> ~/.aws/credentials
   pre_build:
     commands:
-      - PARAM_PREFIX="/${SERVICE_NAME}/${STAGE}/"
+      - PARAM_PREFIX="/${SERVICE_NAME}/${STAGE}"
       - echo $PARAM_PREFIX
       - PARAMETER="env"
       - PARAM_KEY="$PARAM_PREFIX/$PARAMETER"
