@@ -8,7 +8,7 @@ env:
   variables:
     AWS_REGION: "us-west-2"
   docker:
-    image: node:14
+    image: node:18
 
 phases:
   install:
