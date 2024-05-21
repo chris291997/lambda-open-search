@@ -67,7 +67,6 @@ provider:
 # you can add packaging information herepackage:
 package:
   patterns:
-    - '!node_modules/**'
     - '!package.json'
     - '!package-lock.json'
     - '!serverless.yml'
@@ -89,7 +88,6 @@ package:
     - '!.prettierrc' # Exclude Prettier configuration
     - '!buildspec.yml' # Exclude buildspec.yml
     - '!docker-compose.yml' # Exclude docker-compose.yml
-    - src/**/*.ts
 
 functions: ${file(./src/functions/apis/apiHandler.yml)}
 
