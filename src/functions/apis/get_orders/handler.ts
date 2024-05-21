@@ -1,6 +1,6 @@
 
 import { Responses } from './responses';
-import { UserListDynamoAction } from './action';
+import { GetOrderAction } from './action';
 import { PaginationQuery } from '../../../helper/HttpHelper';
 import { APIHttpResponse } from '../../../libs/Contracts/APIHttpResponse';
 import { HttpResponse } from '../../../libs/Contracts/HttpResponse';
@@ -8,17 +8,22 @@ import { ApiGatewayEvent } from '../../../libs/Contracts/ApiGatewayEvent';
 import { API_RESPONSE, THROW_API_ERROR } from '../../../libs/Response';
 
 
-interface QueryStringParameters extends PaginationQuery {
-    sort_value: string;
-}
-
 export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> {
     try {
-        const action = new UserListDynamoAction();
-        const data = await action.execute();
-        // HttpRequestHelper.extractDynamoPagination<QueryStringParameters>(
-        //     <QueryStringParameters>event.queryStringParameters,
-        // ),
+        //for database connnections
+        const action = new GetOrderAction();
+        const id = event.queryStringParameters?.id ?? '';
+        const firstName = event.queryStringParameters?.firstName ?? '';
+        const lastName = event.queryStringParameters?.lastName ?? '';
+        const bulkOrderId = event.queryStringParameters?.bulkOrderId ?? '';
+        const projectId = event.queryStringParameters?.projectId ?? '';
+        const projectName = event.queryStringParameters?.projectName ?? '';
+        const workOrderId = event.queryStringParameters?.workOrderId ?? '';
+        const tenantId = event.queryStringParameters?.tenantId ?? '';
+        const type = event.queryStringParameters?.type ?? '';
+
+        const data = await action.execute(id, firstName, lastName, bulkOrderId, projectId, projectName, workOrderId, tenantId, type);
+
         return API_RESPONSE({
             ...Responses.STATUS_200,
             data,
