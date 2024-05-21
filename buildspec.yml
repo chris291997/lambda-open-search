@@ -18,7 +18,7 @@ phases:
       - export AWS_SECRET_ACCESS_KEY=$(echo $TEMP_ROLE | jq -r '.Credentials.SecretAccessKey')
       - export AWS_SESSION_TOKEN=$(echo $TEMP_ROLE | jq -r '.Credentials.SessionToken')
       - export AWS_ACCESS_PROFILE="TEMP_AWS_PROFILE"
-      - npm install -g serverless@2.43.1 --unsafe
+      - npm install -g serverless@3.38.0 --unsafe
       - npm install --omit=dev
       - mkdir -p ~/.aws
       - echo "[$AWS_ACCESS_PROFILE]" > ~/.aws/credentials
