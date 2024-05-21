@@ -19,6 +19,7 @@ phases:
       - export AWS_ACCESS_PROFILE="TEMP_AWS_PROFILE"
       - npm install -g serverless@3.38.0 --unsafe 
       - npm install --omit=dev
+      - npm prune --production
       - mkdir -p ~/.aws
       - echo "[$AWS_ACCESS_PROFILE]" > ~/.aws/credentials
       - echo "aws_access_key_id=${AWS_ACCESS_KEY_ID}" >> ~/.aws/credentials

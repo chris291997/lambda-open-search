@@ -66,25 +66,30 @@ provider:
 
 # you can add packaging information here
 package:
-  exclude:
-    - .build/*
-    - .vscode/*
-    - .git/*
-    - environment/*
-    - events/*
-    - migrations/*
-    - tests/*
-    - .env.example
-    - .eslintrc.js
-    - .prettierrc
-    - buildspec.yml
-    - custom.yml
-    - docker-compose.yml
-    - package.json
-    - package-lock.json
-    - resources.yml
-    - serverless.yml
-    - tsconfig.json
+  patterns:
+    - '!node_modules/**'
+    - '!package.json'
+    - '!package-lock.json'
+    - '!serverless.yml'
+    - '!tsconfig.json'
+    - '!custom.yml'
+    - '!resources.yml'
+    - '!./**/*.test.*' # Exclude all test files
+    - '!node_modules/**/*.md' # Exclude README files from node_modules
+    - '!node_modules/**/tests/**' # Exclude test directories from node_modules
+    - '!.vscode/**' # Exclude VSCode configuration
+    - '!.git/**' # Exclude Git files
+    - '!.env*' # Exclude environment files
+    - '!.build/**' # Exclude build directory
+    - '!environment/**' # Exclude environment directory
+    - '!events/**' # Exclude events directory
+    - '!migrations/**' # Exclude migrations directory
+    - '!.env.example' # Exclude .env.example file
+    - '!.eslintrc.js' # Exclude ESLint configuration
+    - '!.prettierrc' # Exclude Prettier configuration
+    - '!buildspec.yml' # Exclude buildspec.yml
+    - '!docker-compose.yml' # Exclude docker-compose.yml
+    - src/**/*.ts
 
 
 functions: ${file(./src/functions/apis/apiHandler.yml)}
