@@ -4,16 +4,10 @@
 
 version: 0.2
 
-env:
-  variables:
-    AWS_REGION: "us-west-2"
-  docker:
-    image: node:18
-
 phases:
   install:
-    # runtime-versions:
-    #   nodejs: 14
+    runtime-versions:
+      nodejs: 18
     commands:
       - echo "Installing serverless and dependencies"
       - ASSUME_ROLE_ARN=${DEPLOY_ROLE}
@@ -24,7 +18,7 @@ phases:
       - export AWS_SECRET_ACCESS_KEY=$(echo $TEMP_ROLE | jq -r '.Credentials.SecretAccessKey')
       - export AWS_SESSION_TOKEN=$(echo $TEMP_ROLE | jq -r '.Credentials.SessionToken')
       - export AWS_ACCESS_PROFILE="TEMP_AWS_PROFILE"
-      - npm install -g serverless@2.43.1
+      - npm install -g serverless@2.43.1 --unsafe
       - npm install --omit=dev
       - mkdir -p ~/.aws
       - echo "[$AWS_ACCESS_PROFILE]" > ~/.aws/credentials
