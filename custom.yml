@@ -54,7 +54,7 @@ CARBON_TIMEZONE: ${env:CARBON_TIMEZONE}
 #   identitySource: method.request.header.Authorization
 #   identityValidationExpression: Bearer (.*)
 
-prune:
-  automatic: true
-  includeLayers: true
-  number: 5
+# prune:
+#   automatic: true
+#   includeLayers: true
+#   number: 5
