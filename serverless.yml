@@ -22,7 +22,7 @@ plugins:
   - serverless-offline
   # - serverless-plugin-warmup
   - serverless-api-compression
-  - serverless-prune-plugin
+  # - serverless-prune-plugin
 # app and org for use with dashboard.serverless.com
 
 # You can pin your service to only deploy with a specific Serverless version
