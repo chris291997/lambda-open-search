@@ -12,4 +12,8 @@ export class Logger {
     static debug(name: string, payload: unknown): void {
         console.debug(name, inspect(payload, { depth: null }));
     }
+
+    static log(name: string, payload: unknown): void {
+        console.log(name, inspect(payload, { depth: null }));
+    }
 }
