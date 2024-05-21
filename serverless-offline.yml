@@ -19,7 +19,7 @@ service: serverless-api
 plugins:
   - serverless-dotenv-plugin
   - serverless-plugin-typescript
-  # - serverless-offline
+  - serverless-offline
   # - serverless-plugin-warmup
   - serverless-api-compression
   # - serverless-prune-plugin
