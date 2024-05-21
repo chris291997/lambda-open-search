@@ -1,7 +1,5 @@
 import { Client } from '@opensearch-project/opensearch';
-interface Response {
-  data: any;
-}
+
 const OPENSEARCH_URL = 'https://search-datahub-sandbox-vlcytbmhugnp2a6yoegu4mfhde.us-west-2.es.amazonaws.com';
 const OPENSEARCH_USERNAME = 'master';
 const OPENSEARCH_PASSWORD = 'f8#W!AuSj7Dze!';
@@ -30,7 +28,6 @@ export class GetOrderAction {
       const must: any[] = [];
       // Add term queries for index fields
       if (workOrderId) must.push({ term: { '_id': workOrderId } });
-
       // Add match queries for other fields under _source index
       if (bulkOrderId) must.push({ match: { 'bulkOrderId': bulkOrderId } });
       if (projectId) must.push({ match: { 'projectId': projectId } });
