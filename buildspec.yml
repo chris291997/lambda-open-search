@@ -7,7 +7,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 18
+      nodejs: 16-alpine
     commands:
       - echo "Installing serverless and dependencies"
       - ASSUME_ROLE_ARN=${DEPLOY_ROLE}
