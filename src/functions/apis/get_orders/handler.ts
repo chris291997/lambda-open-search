@@ -12,17 +12,17 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
     try {
         //for database connnections
         const action = new GetOrderAction();
+        const workOrderId = event.queryStringParameters?.workOrderId ?? '';
         const id = event.queryStringParameters?.id ?? '';
         const firstName = event.queryStringParameters?.firstName ?? '';
         const lastName = event.queryStringParameters?.lastName ?? '';
         const bulkOrderId = event.queryStringParameters?.bulkOrderId ?? '';
         const projectId = event.queryStringParameters?.projectId ?? '';
         const projectName = event.queryStringParameters?.projectName ?? '';
-        const workOrderId = event.queryStringParameters?.workOrderId ?? '';
         const tenantId = event.queryStringParameters?.tenantId ?? '';
-        const type = event.queryStringParameters?.type ?? '';
+        const resourceType = event.queryStringParameters?.resourceType ?? '';
 
-        const data = await action.execute(id, firstName, lastName, bulkOrderId, projectId, projectName, workOrderId, tenantId, type);
+        const data = await action.execute(workOrderId, id, firstName, lastName, bulkOrderId, projectId, projectName, tenantId, resourceType);
 
         return API_RESPONSE({
             ...Responses.STATUS_200,
