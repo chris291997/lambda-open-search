@@ -24,7 +24,7 @@ phases:
       - export AWS_SECRET_ACCESS_KEY=$(echo $TEMP_ROLE | jq -r '.Credentials.SecretAccessKey')
       - export AWS_SESSION_TOKEN=$(echo $TEMP_ROLE | jq -r '.Credentials.SessionToken')
       - export AWS_ACCESS_PROFILE="TEMP_AWS_PROFILE"
-      - npm install -g serverless@2.43.1 --unsafe 
+      - npm install -g serverless@2.43.1
       - npm install --omit=dev
       - npm prune --production
       - mkdir -p ~/.aws
@@ -45,7 +45,11 @@ phases:
       - echo $DEST_FILENAME
   build:
     commands:
-      - serverless deploy --stage $STAGE --aws-profile $AWS_ACCESS_PROFILE --region $REGION --config serverless.yml
+    install:
+  commands:
+      - echo "Cleaning serverless cache..."
+      - serverless cache clean 
+      - serverless deploy --verbose --stage $STAGE --aws-profile $AWS_ACCESS_PROFILE --region $REGION --config serverless.yml
   post_build:
     commands:
       - npm install aws-sdk
