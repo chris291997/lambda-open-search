@@ -6,7 +6,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 20
+      nodejs: 12
     commands:
       - echo "Installing serverless and dependencies"
       - ASSUME_ROLE_ARN=${DEPLOY_ROLE}
