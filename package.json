@@ -15,6 +15,7 @@
   "devDependencies": {
     "@types/faker": "^5.5.9",
     "@types/jest": "^26.0.20",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/yargs": "^15.0.12",
     "aws-sdk": "^2.1048.0",
     "chai-json-schema": "^1.5.1",
@@ -33,11 +34,9 @@
   "dependencies": {
     "@aws/dynamodb-data-mapper": "^0.7.3",
     "@aws/dynamodb-data-mapper-annotations": "^0.7.3",
-    "@types/axios": "^0.14.0",
     "@types/bcrypt": "^3.0.0",
     "@types/dot-object": "^2.1.2",
     "@types/joi": "^14.3.4",
-    "@types/moment-timezone": "^0.5.30",
     "@types/node": "^14.18.2",
     "@types/uuid": "^8.3.3",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
