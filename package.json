@@ -45,7 +45,6 @@
     "dotenv": "^8.2.0",
     "joi": "^17.3.0",
     "moment-timezone": "^0.5.34",
-    "serverless": "^3.38.0",
     "serverless-api-compression": "^1.0.1",
     "serverless-dotenv-plugin": "^3.10.0",
     "serverless-plugin-typescript": "^2.1.5",
