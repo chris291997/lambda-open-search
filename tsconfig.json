@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "typeRoots": ["node_modules/@types"],
     "target": "ES2017", // Target ECMAScript 2017
     "module": "CommonJS", // Use CommonJS modules for Node.js
     "strict": true, // Enable strict type-checking options
