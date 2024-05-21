@@ -3,10 +3,17 @@
 # IMPORTANT NOTE   : "Please do not change anything to this file.  c/o author"
 
 version: 0.2
+
+env:
+  variables:
+    AWS_REGION: "us-west-2"
+  docker:
+    image: node:14
+
 phases:
   install:
-    runtime-versions:
-      nodejs: 14
+    # runtime-versions:
+    #   nodejs: 14
     commands:
       - echo "Installing serverless and dependencies"
       - ASSUME_ROLE_ARN=${DEPLOY_ROLE}
