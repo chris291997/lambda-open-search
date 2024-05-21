@@ -47,9 +47,7 @@ phases:
     commands:
     install:
   commands:
-      - echo "Cleaning serverless cache..."
-      - serverless cache clean 
-      - serverless deploy --verbose --stage $STAGE --aws-profile $AWS_ACCESS_PROFILE --region $REGION --config serverless.yml
+      - serverless deploy --stage $STAGE --aws-profile $AWS_ACCESS_PROFILE --region $REGION --config serverless.yml
   post_build:
     commands:
       - npm install aws-sdk
