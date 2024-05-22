@@ -2,7 +2,7 @@ orders_list:
   handler: src/functions/apis/get_orders/handler.execute
   events:
     - http:
-        path: /orders/list
+        path: orders/list
         method: get
         cors: true
   

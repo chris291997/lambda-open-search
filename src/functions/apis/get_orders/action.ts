@@ -55,6 +55,8 @@ export class GetOrderAction {
       const query: any = must.length > 0 ? queryWithParameters : { query: { match_all: {} } };
       
       // Make the request to OpenSearch with basic authentication
+
+      //TODO: MAKE THIS SEARCH AS A SERVICE (params -> index and query)
       const response = await client.search({
         index: 'orders',
         body: query,
