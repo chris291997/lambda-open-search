@@ -21,11 +21,7 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
         const action = new GetOrderAction();
         const workOrderId = event.queryStringParameters?.workOrderId ?? '';
         const decodedWorkOrderId = decodeURIComponent(workOrderId);
-
-        console.log('encoded workOrderId', workOrderId);
-        console.log('decoded workOrderId', decodedWorkOrderId);
-
-        const id = event.queryStringParameters?.id ?? '';
+        const memberId = event.queryStringParameters?.memberId ?? '';
         const firstName = event.queryStringParameters?.firstName ?? '';
         const lastName = event.queryStringParameters?.lastName ?? '';
         const bulkOrderId = event.queryStringParameters?.bulkOrderId ?? '';
@@ -33,8 +29,24 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
         const projectName = event.queryStringParameters?.projectName ?? '';
         const tenantId = event.queryStringParameters?.tenantId ?? '';
         const resourceType = event.queryStringParameters?.resourceType ?? '';
+        const providerId = event.queryStringParameters?.providerId ?? '';
+        const page = Number(event.queryStringParameters?.page) ?? 1;
+        const limit = Number(event.queryStringParameters?.limit) ?? 10;
 
-        const data = await action.execute(decodedWorkOrderId, id, firstName, lastName, bulkOrderId, projectId, projectName, tenantId, resourceType);
+        const data = await action.execute(
+            page,
+            limit,
+            decodedWorkOrderId, 
+            memberId, 
+            firstName, 
+            lastName, 
+            bulkOrderId, 
+            projectId, 
+            projectName, 
+            tenantId, 
+            resourceType, 
+            providerId, 
+        );
 
         return API_RESPONSE({
             ...Responses.STATUS_200,

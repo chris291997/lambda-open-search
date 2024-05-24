@@ -14,17 +14,21 @@ const client = new Client({
 
 export class GetOrderAction {
   async execute(
+    page: number,
+    limit: number,
     workOrderId?: string,
-    id?: string,
+    memberId?: string,
     firstName?: string,
     lastName?: string,
     bulkOrderId?: string,
     projectId?: string,
     projectName?: string,
     tenantId?: string,
-    resourceType?: string
-  ): Promise<object> {
-     try {
+    resourceType?: string,
+    providerId?: string,
+    groupByProviderId?: boolean,
+  ): Promise<{ response: object; count: number; total: number; }> {
+    try {
       const must: any[] = [];
       // Add term queries for index fields
       if (workOrderId) must.push({ term: { '_id': workOrderId } });
@@ -34,36 +38,42 @@ export class GetOrderAction {
       if (projectName) must.push({ match: { 'projectName': projectName } });
       if (tenantId) must.push({ match: { 'tenantId': tenantId } });
       if (resourceType) must.push({ match: { 'type': resourceType } });
+      if (firstName) must.push({ match: { 'patient.firstName': firstName } });
+      if (lastName) must.push({ match: { 'patient.lastName': lastName } });
+      if (memberId) must.push({ match: { 'patient.memberId': memberId } });
 
-      // Use multi_match for firstName and lastName if both are provided
-      if (firstName && lastName) {
-        must.push({
-          multi_match: {
-            query: `${firstName} ${lastName}`,
-            fields: ['patient.firstName', 'patient.lastName']
-          }
-        });
-      } else {
-        if (firstName) must.push({ match: { 'patient.firstName': firstName } });
-        if (lastName) must.push({ match: { 'patient.lastName': lastName } });
-      }
-      if (id) must.push({ match: { 'patient.id': id } });
+      const query: any = {
+        query: must.length > 0 ? { bool: { must } } : { match_all: {} },
+        size: limit, // Limit the number of documents
+        from: (page - 1) * limit, // Pagination
+      };
+      console.log("Constructed Search Query:", JSON.stringify(query, null, 2));
 
-      const queryWithParameters = { query: { bool: { must: must } } };
-      
-      // Constructing the query object
-      const query: any = must.length > 0 ? queryWithParameters : { query: { match_all: {} } };
-      
-      // Make the request to OpenSearch with basic authentication
-
-      //TODO: MAKE THIS SEARCH AS A SERVICE (params -> index and query)
       const response = await client.search({
         index: 'orders',
         body: query,
       });
-      
-      return response.body;
 
+      // Handle empty response
+      if (response.body.hits.total.value === 0) {
+        console.warn('No documents found matching the search criteria.');
+        return { response: {}, count: 0, total: 0 };
+      }
+
+      const total = response.body.hits.total.value;
+      const data = response.body.hits.hits.map((hit: any) => hit._source);
+      const providerGroups: { [key: string]: any[] } = {};
+
+      // Group documents by providerGroupName
+      data.forEach((doc: any) => {
+        const providerGroupName = doc.identifiers.find((id: any) => id.type === 'providerGroupName')?.value || 'Unknown Group';
+        if (!providerGroups[providerGroupName]) {
+          providerGroups[providerGroupName] = [];
+        }
+        providerGroups[providerGroupName].push(doc);
+      });
+
+      return { response: providerGroups, count: data.length, total: total };
     } catch (error) {
       throw new Error(`Error querying OpenSearch: ${error}`);
     }
