@@ -1,4 +1,5 @@
 import { Client } from '@opensearch-project/opensearch';
+import moment from 'moment';
 
 const OPENSEARCH_URL = 'https://search-datahub-sandbox-vlcytbmhugnp2a6yoegu4mfhde.us-west-2.es.amazonaws.com';
 const OPENSEARCH_USERNAME = 'master';
@@ -14,8 +15,9 @@ const client = new Client({
 
 export class GetOrderAction {
   async execute(
-    page: number,
-    limit: number,
+    page: number = 1,
+    limit: number = 10,
+    age: number = 10,
     workOrderId?: string,
     memberId?: string,
     firstName?: string,
@@ -25,28 +27,54 @@ export class GetOrderAction {
     projectName?: string,
     tenantId?: string,
     resourceType?: string,
-    providerId?: string,
-    groupByProviderId?: boolean,
   ): Promise<{ response: object; count: number; total: number; }> {
     try {
       const must: any[] = [];
+      const filter: any[] = [];
       // Add term queries for index fields
       if (workOrderId) must.push({ term: { '_id': workOrderId } });
-      // Add match queries for other fields under _source index
       if (bulkOrderId) must.push({ match: { 'bulkOrderId': bulkOrderId } });
       if (projectId) must.push({ match: { 'projectId': projectId } });
-      if (projectName) must.push({ match: { 'projectName': projectName } });
       if (tenantId) must.push({ match: { 'tenantId': tenantId } });
-      if (resourceType) must.push({ match: { 'type': resourceType } });
-      if (firstName) must.push({ match: { 'patient.firstName': firstName } });
-      if (lastName) must.push({ match: { 'patient.lastName': lastName } });
-      if (memberId) must.push({ match: { 'patient.memberId': memberId } });
 
-      const query: any = {
-        query: must.length > 0 ? { bool: { must } } : { match_all: {} },
+      if (projectName) filter.push({ match: { 'projectName': projectName } });
+      if (resourceType) filter.push({ match: { 'type': resourceType } });
+      if (firstName) filter.push({ match: { 'patient.firstName': firstName } });
+      if (lastName) filter.push({ match: { 'patient.lastName': lastName } });
+      if (memberId) filter.push({ match: { 'patient.memberId': memberId } });
+
+      // Calculate date for age filtering
+      if (age !== undefined) {
+        const dateThreshold = moment().subtract(age, 'days').toISOString();
+        filter.push({
+          range: {
+            'createDateTime': {
+              gte: dateThreshold
+            }
+          }
+        });
+      }
+
+      let query: any = {
         size: limit, // Limit the number of documents
         from: (page - 1) * limit, // Pagination
       };
+
+      if (must.length > 0 || filter.length > 0) {
+        query.query = {
+          bool: {}
+        };
+
+        if (must.length > 0) {
+          query.query.bool.must = must;
+        }
+
+        if (filter.length > 0) {
+          query.query.bool.filter = filter;
+        }
+      } else {
+        query.query = { match_all: {} };
+      }
       console.log("Constructed Search Query:", JSON.stringify(query, null, 2));
 
       const response = await client.search({

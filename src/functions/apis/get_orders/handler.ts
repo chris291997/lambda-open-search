@@ -29,13 +29,14 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
         const projectName = event.queryStringParameters?.projectName ?? '';
         const tenantId = event.queryStringParameters?.tenantId ?? '';
         const resourceType = event.queryStringParameters?.resourceType ?? '';
-        const providerId = event.queryStringParameters?.providerId ?? '';
         const page = Number(event.queryStringParameters?.page) ?? 1;
         const limit = Number(event.queryStringParameters?.limit) ?? 10;
+        const age = Number(event.queryStringParameters?.age) ?? 10;
 
         const data = await action.execute(
             page,
             limit,
+            age,
             decodedWorkOrderId, 
             memberId, 
             firstName, 
@@ -45,7 +46,6 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
             projectName, 
             tenantId, 
             resourceType, 
-            providerId, 
         );
 
         return API_RESPONSE({
