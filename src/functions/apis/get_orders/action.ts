@@ -17,7 +17,7 @@ export class GetOrderAction {
   async execute(
     page: number = 1,
     limit: number = 10,
-    age: number = 10,
+    age: number = 0,
     workOrderId?: string,
     memberId?: string,
     firstName?: string,
@@ -42,9 +42,9 @@ export class GetOrderAction {
       if (firstName) filter.push({ match: { 'patient.firstName': firstName } });
       if (lastName) filter.push({ match: { 'patient.lastName': lastName } });
       if (memberId) filter.push({ match: { 'patient.memberId': memberId } });
-
+      console.log(age)
       // Calculate date for age filtering
-      if (age !== undefined) {
+      if (age !== 0) {
         const dateThreshold = moment().subtract(age, 'days').toISOString();
         filter.push({
           range: {

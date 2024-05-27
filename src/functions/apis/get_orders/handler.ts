@@ -29,10 +29,10 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
         const projectName = event.queryStringParameters?.projectName ?? '';
         const tenantId = event.queryStringParameters?.tenantId ?? '';
         const resourceType = event.queryStringParameters?.resourceType ?? '';
-        const page = Number(event.queryStringParameters?.page) ?? 1;
-        const limit = Number(event.queryStringParameters?.limit) ?? 10;
-        const age = Number(event.queryStringParameters?.age) ?? 10;
-
+        const page = Number(event.queryStringParameters?.page) | Number(1);
+        const limit = Number(event.queryStringParameters?.limit) | Number(10);
+        const age = Number(event.queryStringParameters?.age) | Number(0);
+   
         const data = await action.execute(
             page,
             limit,
