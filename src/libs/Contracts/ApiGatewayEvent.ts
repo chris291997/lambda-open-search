@@ -36,9 +36,6 @@ export interface ApiGatewayEvent {
         [key: string]: string;
     };
     requestContext?: RequestContext;
-    identity?: {
-        sourceIP: string;
-    };
 }
 
 export interface Event {

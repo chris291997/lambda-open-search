@@ -5,8 +5,6 @@ import { APIHttpResponse } from '../../../libs/Contracts/APIHttpResponse';
 import { HttpResponse } from '../../../libs/Contracts/HttpResponse';
 import { ApiGatewayEvent } from '../../../libs/Contracts/ApiGatewayEvent';
 import { API_RESPONSE, THROW_API_ERROR } from '../../../libs/Response';
-import { GetOrderRequest } from './request';
-import Validate from './validate';
 
 
 export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> {
@@ -16,6 +14,7 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
          * Use this validate if validating an object from event.body
          * const request: GetOrderRequest = Validate(JSON.parse(event.body));
          */
+        
        
         //for database connnections
         const action = new GetOrderAction();
@@ -32,7 +31,8 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
         const page = event.queryStringParameters?.page ?? '';
         const limit = event.queryStringParameters?.limit ?? '';
         const age = event.queryStringParameters?.age ?? '';
-   
+        const groupByField = event.queryStringParameters?.groupByField ?? '';
+        
         const data = await action.execute(
             page,
             limit,
@@ -46,6 +46,7 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
             projectName, 
             tenantId, 
             resourceType, 
+            groupByField,
         );
 
         return API_RESPONSE({

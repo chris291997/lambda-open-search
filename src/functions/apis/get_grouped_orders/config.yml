@@ -1,0 +1,14 @@
+grouped_orders_list:
+  handler: src/functions/apis/get_grouped_orders/handler.execute
+  events:
+    - http:
+        path: grouped_orders/list
+        method: get
+        cors: true
+  
+        # authorizer: ${self:custom.ACCESS_TOKEN_AUTHORIZE}
+  description: display a test item from orders
+  #warmup enabled
+  # warmup:
+  #   default:
+  #     enabled: true

@@ -4,4 +4,5 @@
 
 # APIS ADMIN
  - ${file(./src/functions/apis/get_orders/config.yml)} # Remove this when you dont need it
+ - ${file(./src/functions/apis/get_grouped_orders/config.yml)} # Remove this when you dont need it
 

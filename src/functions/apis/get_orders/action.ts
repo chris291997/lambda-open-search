@@ -15,9 +15,9 @@ const client = new Client({
 
 export class GetOrderAction {
   async execute(
-    page: number = 1,
-    limit: number = 10,
-    age: number = 0,
+    page: string,
+    limit: string,
+    age: string,
     workOrderId?: string,
     memberId?: string,
     firstName?: string,
@@ -27,10 +27,14 @@ export class GetOrderAction {
     projectName?: string,
     tenantId?: string,
     resourceType?: string,
-  ): Promise<{ response: object; count: number; total: number; }> {
+  ): Promise<{ response: object; page: number; count: number; total: number; }> {
     try {
       const must: any[] = [];
       const filter: any[] = [];
+          
+      const pageNumber = Number(page);
+      const days = Number(age);
+      const limitNumber = Number(limit);
       // Add term queries for index fields
       if (workOrderId) must.push({ term: { '_id': workOrderId } });
       if (bulkOrderId) must.push({ match: { 'bulkOrderId': bulkOrderId } });
@@ -44,7 +48,7 @@ export class GetOrderAction {
       if (memberId) filter.push({ match: { 'patient.memberId': memberId } });
       console.log(age)
       // Calculate date for age filtering
-      if (age !== 0) {
+      if (days !== 0) {
         const dateThreshold = moment().subtract(age, 'days').toISOString();
         filter.push({
           range: {
@@ -56,8 +60,8 @@ export class GetOrderAction {
       }
 
       let query: any = {
-        size: limit, // Limit the number of documents
-        from: (page - 1) * limit, // Pagination
+        size: limitNumber, // Limit the number of documents
+        from: (pageNumber - 1) * limitNumber, // Pagination
       };
 
       if (must.length > 0 || filter.length > 0) {
@@ -85,7 +89,7 @@ export class GetOrderAction {
       // Handle empty response
       if (response.body.hits.total.value === 0) {
         console.warn('No documents found matching the search criteria.');
-        return { response: {}, count: 0, total: 0 };
+        return { response: {}, page: pageNumber, count: 0, total: 0 };
       }
 
       const total = response.body.hits.total.value;
@@ -101,7 +105,7 @@ export class GetOrderAction {
         providerGroups[providerGroupName].push(doc);
       });
 
-      return { response: providerGroups, count: data.length, total: total };
+      return { response: providerGroups, page: pageNumber, count: data.length, total: total };
     } catch (error) {
       throw new Error(`Error querying OpenSearch: ${error}`);
     }
