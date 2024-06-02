@@ -15,7 +15,7 @@ const client = new Client({
 
 export class GetOrderAction {
   async execute(
-    page: string,
+    pointer: string,
     limit: string,
     age: string,
     workOrderId?: string,
@@ -27,16 +27,17 @@ export class GetOrderAction {
     projectName?: string,
     tenantId?: string,
     resourceType?: string,
+    chaseId?: string,
   ): Promise<{ response: object; page: number; count: number; total: number; }> {
     try {
-      const must: any[] = [];
-      const filter: any[] = [];
-          
-      const pageNumber = Number(page);
+      const pageNumber = Number(pointer);
       const days = Number(age);
       const limitNumber = Number(limit);
-      // Add term queries for index fields
+
+      const must: any[] = [];
+      const filter: any[] = [];
       if (workOrderId) must.push({ term: { '_id': workOrderId } });
+      if (chaseId) must.push({ term: { 'id': chaseId } });
       if (bulkOrderId) must.push({ match: { 'bulkOrderId': bulkOrderId } });
       if (projectId) must.push({ match: { 'projectId': projectId } });
       if (tenantId) must.push({ match: { 'tenantId': tenantId } });
@@ -46,8 +47,7 @@ export class GetOrderAction {
       if (firstName) filter.push({ match: { 'patient.firstName': firstName } });
       if (lastName) filter.push({ match: { 'patient.lastName': lastName } });
       if (memberId) filter.push({ match: { 'patient.memberId': memberId } });
-      console.log(age)
-      // Calculate date for age filtering
+
       if (days !== 0) {
         const dateThreshold = moment().subtract(age, 'days').toISOString();
         filter.push({
@@ -60,33 +60,27 @@ export class GetOrderAction {
       }
 
       let query: any = {
-        size: limitNumber, // Limit the number of documents
-        from: (pageNumber - 1) * limitNumber, // Pagination
+        size: pageNumber * limitNumber,
+        from: (pageNumber - 1) * limitNumber,
+        sort: [{ 'id': 'asc' }] // Sorting by id.keyword in ascending order
       };
 
       if (must.length > 0 || filter.length > 0) {
         query.query = {
-          bool: {}
+          bool: {
+            must,
+            filter
+          }
         };
-
-        if (must.length > 0) {
-          query.query.bool.must = must;
-        }
-
-        if (filter.length > 0) {
-          query.query.bool.filter = filter;
-        }
       } else {
         query.query = { match_all: {} };
       }
-      console.log("Constructed Search Query:", JSON.stringify(query, null, 2));
 
       const response = await client.search({
-        index: 'orders',
+        index: 'new_orders_v3',
         body: query,
       });
 
-      // Handle empty response
       if (response.body.hits.total.value === 0) {
         console.warn('No documents found matching the search criteria.');
         return { response: {}, page: pageNumber, count: 0, total: 0 };
@@ -94,18 +88,14 @@ export class GetOrderAction {
 
       const total = response.body.hits.total.value;
       const data = response.body.hits.hits.map((hit: any) => hit._source);
-      const providerGroups: { [key: string]: any[] } = {};
 
-      // Group documents by providerGroupName
-      data.forEach((doc: any) => {
-        const providerGroupName = doc.identifiers.find((id: any) => id.type === 'providerGroupName')?.value || 'Unknown Group';
-        if (!providerGroups[providerGroupName]) {
-          providerGroups[providerGroupName] = [];
-        }
-        providerGroups[providerGroupName].push(doc);
-      });
+      // Check if the id is missing in some documents
+      const missingIds = data.filter((doc: any) => !doc.id);
+      if (missingIds.length > 0) {
+        console.warn(`${missingIds.length} document(s) found with missing id.`);
+      }
 
-      return { response: providerGroups, page: pageNumber, count: data.length, total: total };
+      return { response: data, page: pageNumber, count: data.length, total: total };
     } catch (error) {
       throw new Error(`Error querying OpenSearch: ${error}`);
     }

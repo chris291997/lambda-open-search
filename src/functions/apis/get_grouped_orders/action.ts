@@ -15,7 +15,7 @@ const client = new Client({
 
 export class GetOrderAction {
   async execute(
-    page: string,
+    pointer: string,
     limit: string,
     age: string,
     workOrderId?: string,
@@ -28,12 +28,12 @@ export class GetOrderAction {
     tenantId?: string,
     resourceType?: string,
     groupByField?: string,
-  ): Promise<{ response: object; page: number; count?: number; total?: number; }> {
+  ): Promise<{ response: object; pointer: number; count?: number; total?: number; }> {
     try {
       const must: any[] = [];
       const filter: any[] = [];
       
-      const pageNumber = Number(page);
+      const pageNumber = Number(pointer);
       const days = Number(age);
       const limitNumber = Number(limit);
 
@@ -52,7 +52,7 @@ export class GetOrderAction {
       // Only include query part if groupByField is not specified
       if (!groupByField) {
         query.size = limitNumber; // Limit the number of documents
-        query.from = (pageNumber - 1) * limitNumber; // Pagination
+        query.from = pageNumber * limitNumber - limitNumber; // Pagination
 
         if (days !== 0) {
           const dateThreshold = moment().subtract(days, 'days').toISOString();
@@ -79,6 +79,9 @@ export class GetOrderAction {
           }
         } else {
           query.query = { match_all: {} };
+          query.size = pageNumber * limitNumber;
+          query.from = (pageNumber - 1) * limitNumber;
+          query.sort = [{ 'id': 'asc' }]; // Sorting by id.keyword in ascending order
         }
       }
 
@@ -90,36 +93,55 @@ export class GetOrderAction {
               terms: {
                 script: {
                   source: `
-                    if (params['_source'].containsKey('identifiers')) {
-                      def identifiers = params['_source']['identifiers'];
-                      def providerId = null;
-                      def providerGroupName = null;
-                      for (int i = 0; i < identifiers.length; ++i) {
-                        if (identifiers[i]['type'] == 'providerId') {
-                          providerId = identifiers[i]['value'];
-                        }
-                        if (identifiers[i]['type'] == 'providerGroupName') {
-                          providerGroupName = identifiers[i]['value'];
-                        }
-                      }
-                      return providerId != null ? providerId + ' (' + providerGroupName + ')' : null;
-                    }
-                    return null;
+                    def providerName = doc.containsKey('providerProfile.name') ? doc['providerProfile.name'].toString() : null;
+                    def providerId = doc.containsKey('providerProfile.id') ? doc['providerProfile.id'].value : null;
+                    def key = providerName + (providerId != null ? providerId : "");
+                    return key;
                   `,
                   lang: "painless"
+                },
+                order: {
+                  _key: "asc"
                 },
                 size: limitNumber * pageNumber
               }
             }
           };
-        } else {
+        } else if (groupByField === 'project') {
           query.aggs = {
-            group_by: {
+            group_by_project: {
               terms: {
-                field: groupByField,
+                script: {
+                  source: `
+                  def projectName = doc.containsKey('projectName') && doc['projectName'].size() > 0 ? doc['projectName'].value : null;
+                  return projectName;
+                  `,
+                  lang: "painless"
+                },  // Use keyword subfield for aggregation
+                order: {
+                  _key: "asc"  // Sort by key (project name) in ascending order
+                },
                 size: limitNumber * pageNumber
-              },
-            },
+              }
+            }
+          };
+        } else if (groupByField === 'tin') {
+          query.aggs = {
+            group_by_tin: {
+              terms: {
+                script: {
+                  source: `
+                  def tin = doc.containsKey('practitioner.tin') && doc['practitioner.tin'].size() > 0 ? doc['practitioner.tin'].value : null;
+                  return tin;
+                  `,
+                  lang: "painless"
+                },
+                order: {
+                  _key: "asc"
+                },
+                size: limitNumber * pageNumber
+              }
+            }
           };
         }
       }
@@ -127,41 +149,67 @@ export class GetOrderAction {
       console.log("Constructed Search Query:", JSON.stringify(query, null, 2));
 
       const response = await client.search({
-        index: 'orders',
+        index: 'new_orders_v3',
         body: query,
       });
-      const body = response.body.hits;
 
-      if (groupByField && response.body.aggregations && response.body.aggregations.group_by_provider) {
-        const allBuckets = response.body.aggregations.group_by_provider.buckets.map((bucket: { key: string; doc_count: number; }) => {
-          const key = bucket.key;
-          const startIndex = key.indexOf('(');
-          const endIndex = key.indexOf(')');
-          const providerName = key.substring(startIndex + 1, endIndex).trim();
-          const providerId = key.substring(0, startIndex).trim();
-          return {
-            response : {
-              providerName,
-              doc_count: bucket.doc_count,
-              providerId
+      if (groupByField && response.body.aggregations) {
+        let allBuckets;
+
+        if (groupByField === 'provider' && response.body.aggregations.group_by_provider) {
+          allBuckets = response.body.aggregations.group_by_provider.buckets.map((bucket: { key: any; doc_count: any; }) => {
+            const key = bucket.key;
+            const providerNameRegex = /\[(.*?)\](.*)/;
+            const match = providerNameRegex.exec(key);
+          
+            let providerName;
+            let providerId;
+          
+            if (match) {
+              providerName = match[1];
+              providerId = match[2];
+            } else {
+              providerName = key;
+              providerId = null;
             }
-          };
-        });
+          
+            return {
+              providerName,
+              providerId,
+              doc_count: bucket.doc_count,
+            };
+          });
+        } else if (groupByField === 'project' && response.body.aggregations.group_by_project) {
+          allBuckets = response.body.aggregations.group_by_project.buckets.map((bucket: { key: any; doc_count: any; }) => {
+            return {
+              projectName: bucket.key,
+              doc_count: bucket.doc_count,
+            };
+          });
+        } else if (groupByField === 'tin' && response.body.aggregations.group_by_tin) {
+          allBuckets = response.body.aggregations.group_by_tin.buckets.map((bucket: { key: any; doc_count: any; }) => {
+            return {
+              tin: bucket.key,
+              doc_count: bucket.doc_count,
+            };
+          });
+        }
       
         return {
           response: allBuckets,
-          page: pageNumber,
+          pointer: pageNumber,
           count: allBuckets.length,
-          total: body.total.value,
-        }
-      } 
+          total: response.body.hits.total.value,  // Use hits.total.value for total
+        };
+      }
 
+      const body = response.body.hits;
       return {
         response: body.hits,
-        page: pageNumber,
+        pointer: pageNumber,
         count: body.hits.length,
         total: body.total.value,
-      }
+      };
     } catch (error) {
       throw new Error(`Error querying OpenSearch: ${error}`);
     }
