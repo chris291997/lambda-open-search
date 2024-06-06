@@ -1,5 +1,6 @@
 import { Client } from '@opensearch-project/opensearch';
 import moment from 'moment';
+import { ChasesMapper } from './adaptor/chase-mapper';
 
 const OPENSEARCH_URL = 'https://search-datahub-sandbox-vlcytbmhugnp2a6yoegu4mfhde.us-west-2.es.amazonaws.com';
 const OPENSEARCH_USERNAME = 'master';
@@ -28,6 +29,8 @@ export class GetOrderAction {
     tenantId?: string,
     resourceType?: string,
     groupByField?: string,
+    chaseId?: string,
+
   ): Promise<{ response: object; pointer: number; count?: number; total?: number; }> {
     try {
       const must: any[] = [];
@@ -41,6 +44,7 @@ export class GetOrderAction {
       if (bulkOrderId) must.push({ match: { 'bulkOrderId': bulkOrderId } });
       if (projectId) must.push({ match: { 'projectId': projectId } });
       if (tenantId) must.push({ match: { 'tenantId': tenantId } });
+      if (chaseId) must.push({ term: { 'id': chaseId } });
 
       if (projectName) filter.push({ match: { 'projectName': projectName } });
       if (resourceType) filter.push({ match: { 'type': resourceType } });
@@ -104,6 +108,13 @@ export class GetOrderAction {
                   _key: "asc"
                 },
                 size: limitNumber * pageNumber
+              },
+              aggs: {
+                top_hits: {
+                  top_hits: {
+                    size: 1
+                  }
+                }
               }
             }
           };
@@ -122,6 +133,13 @@ export class GetOrderAction {
                   _key: "asc"  // Sort by key (project name) in ascending order
                 },
                 size: limitNumber * pageNumber
+              },
+              aggs: {
+                top_hits: {
+                  top_hits: {
+                    size: 1
+                  }
+                }
               }
             }
           };
@@ -131,15 +149,21 @@ export class GetOrderAction {
               terms: {
                 script: {
                   source: `
-                  def tin = doc.containsKey('practitioner.tin') && doc['practitioner.tin'].size() > 0 ? doc['practitioner.tin'].value : null;
-                  return tin;
+                    def tin = doc.containsKey('practitioner.tin') && doc['practitioner.tin'].size() > 0 ? doc['practitioner.tin'].value : null;
+                    return tin;
                   `,
                   lang: "painless"
                 },
                 order: {
                   _key: "asc"
-                },
-                size: limitNumber * pageNumber
+                }
+              },
+              aggs: {
+                top_hits: {
+                  top_hits: {
+                    size: 1
+                  }
+                }
               }
             }
           };
@@ -157,11 +181,18 @@ export class GetOrderAction {
         let allBuckets;
 
         if (groupByField === 'provider' && response.body.aggregations.group_by_provider) {
-          allBuckets = response.body.aggregations.group_by_provider.buckets.map((bucket: { key: any; doc_count: any; }) => {
+          allBuckets = response.body.aggregations.group_by_provider.buckets.map((bucket: { key: string; doc_count: number; top_hits:any; }) => {
             const key = bucket.key;
             const providerNameRegex = /\[(.*?)\](.*)/;
             const match = providerNameRegex.exec(key);
-          
+            const source = bucket.top_hits.hits.hits[0]._source;
+            const identifiers = source.identifiers;
+            const doctorIdObject = identifiers.find((identifier: { type: string; }) => identifier.type === 'doctorId');
+            const doctorId = doctorIdObject ? doctorIdObject.value : null;
+            const tin = source.practitioner?.tin ?? source.originalPractitioner?.tin ?? "";
+            const orgUnitName = source.orgUnitName ?? "";
+            const projectName = source.projectName ?? "";
+            
             let providerName;
             let providerId;
           
@@ -174,22 +205,52 @@ export class GetOrderAction {
             }
           
             return {
-              providerName,
+              tin,
+              doctorId,
               providerId,
+              providerName,
+              orgUnitName,
+              projectName,
               doc_count: bucket.doc_count,
             };
           });
         } else if (groupByField === 'project' && response.body.aggregations.group_by_project) {
-          allBuckets = response.body.aggregations.group_by_project.buckets.map((bucket: { key: any; doc_count: any; }) => {
+          allBuckets = response.body.aggregations.group_by_project.buckets.map((bucket: { key: string; doc_count: number; top_hits:any }) => {
+            const source = bucket.top_hits.hits.hits[0]._source;
+            const orgUnitName = source.orgUnitName ?? "";
+            const provider = bucket.top_hits.hits.hits[0]._source.providerProfile;
+            const identifiers = source.identifiers;
+            const doctorIdObject = identifiers.find((identifier: { type: string; }) => identifier.type === 'doctorId');
+            const doctorId = doctorIdObject ? doctorIdObject.value : null;
+            const tin = source.practitioner?.tin ?? source.originalPractitioner?.tin ?? "";
             return {
+              tin,
+              doctorId,
+              providerId: provider.id,
+              providerName: provider.name,
               projectName: bucket.key,
+              orgUnitName,
               doc_count: bucket.doc_count,
             };
           });
         } else if (groupByField === 'tin' && response.body.aggregations.group_by_tin) {
-          allBuckets = response.body.aggregations.group_by_tin.buckets.map((bucket: { key: any; doc_count: any; }) => {
+            allBuckets = response.body.aggregations.group_by_tin.buckets.map((bucket: { key: string; doc_count: number; top_hits:any }) => {
+            const source = bucket.top_hits.hits.hits[0]._source;
+            const identifiers = source.identifiers;
+            const doctorIdObject = identifiers.find((identifier: { type: string; }) => identifier.type === 'doctorId');
+            const doctorId = doctorIdObject ? doctorIdObject.value : null;
+            const provider = bucket.top_hits.hits.hits[0]._source.providerProfile;
+            const projectName = source.projectName ?? "";
+            const orgUnitName = source.orgUnitName ?? "";
+
+            console.log(doctorId)
             return {
               tin: bucket.key,
+              doctorId,
+              providerId: provider.id,
+              providerName: provider.name,
+              projectName,
+              orgUnitName,
               doc_count: bucket.doc_count,
             };
           });
@@ -204,8 +265,11 @@ export class GetOrderAction {
       }
 
       const body = response.body.hits;
+      const data = body.hits.map((hit: any) => hit._source);
+      const mappedResponse = ChasesMapper.mapArray(data);
+      console.log(mappedResponse);
       return {
-        response: body.hits,
+        response: mappedResponse,
         pointer: pageNumber,
         count: body.hits.length,
         total: body.total.value,

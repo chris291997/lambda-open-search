@@ -32,6 +32,7 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
         const limit = event.queryStringParameters?.limit ?? '';
         const age = event.queryStringParameters?.age ?? '';
         const groupByField = event.queryStringParameters?.groupByField ?? '';
+        const chaseId = event.queryStringParameters?.chaseId ?? '';
         
         const data = await action.execute(
             pointer,
@@ -47,6 +48,7 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
             tenantId, 
             resourceType, 
             groupByField,
+            chaseId
         );
 
         return API_RESPONSE({
