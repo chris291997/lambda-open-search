@@ -1,5 +1,6 @@
 import { Client } from '@opensearch-project/opensearch';
 import moment from 'moment';
+import { ChasesMapper } from './adaptor/chase-mapper';
 
 const OPENSEARCH_URL = 'https://search-datahub-sandbox-vlcytbmhugnp2a6yoegu4mfhde.us-west-2.es.amazonaws.com';
 const OPENSEARCH_USERNAME = 'master';
@@ -94,8 +95,11 @@ export class GetOrderAction {
       if (missingIds.length > 0) {
         console.warn(`${missingIds.length} document(s) found with missing id.`);
       }
+      // Map the response data to ChaseExcerptV2 objects
+      const mappedResponse = ChasesMapper.mapArray(data);
 
-      return { response: data, page: pageNumber, count: data.length, total: total };
+      
+      return { response: mappedResponse, page: pageNumber, count: data.length, total: total };
     } catch (error) {
       throw new Error(`Error querying OpenSearch: ${error}`);
     }

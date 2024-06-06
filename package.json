@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "docker - serverless - ts-node",
   "scripts": {
+    "swagger:build": "eslint --ext .ts docs/swagger --fix && ts-node docs/swagger/generate.ts",
     "start": "docker-compose up -d",
     "stop": "docker-compose stop",
     "lint": "eslint --ext .ts src/ --fix",
@@ -51,6 +52,7 @@
     "serverless-plugin-typescript": "^2.1.5",
     "typeorm": "^0.2.41",
     "typescript": "^4.9.5",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "yaml": "^1.10.0"
   }
 }
