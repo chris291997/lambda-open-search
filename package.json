@@ -18,7 +18,7 @@
     "@types/faker": "^5.5.9",
     "@types/jest": "^26.0.20",
     "@types/yargs": "^15.0.12",
-    "aws-sdk": "^2.1048.0",
+    "aws-sdk": "^2.1637.0",
     "chai-json-schema": "^1.5.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^7.1.0",
@@ -34,10 +34,10 @@
     "yargs": "^16.2.0"
   },
   "dependencies": {
-    "@opensearch-project/opensearch": "^2.8.0",
+    "@aws-sdk/signature-v4": "^3.374.0",
+    "@opensearch-project/opensearch": "^2.9.0",
     "@types/dot-object": "^2.1.2",
     "@types/joi": "^14.3.4",
-    "@types/node": "^14.18.2",
     "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",

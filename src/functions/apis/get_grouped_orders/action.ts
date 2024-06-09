@@ -1,19 +1,30 @@
-import { Client } from '@opensearch-project/opensearch';
 import moment from 'moment';
 import { ChasesMapper } from './adaptor/chase-mapper';
+import { Client } from '@opensearch-project/opensearch';
+import { AwsSigv4Signer } from '@opensearch-project/opensearch/aws';
+import { fromSSO } from '@aws-sdk/credential-provider-sso';
 
-const OPENSEARCH_URL = 'https://search-datahub-sandbox-vlcytbmhugnp2a6yoegu4mfhde.us-west-2.es.amazonaws.com';
-const OPENSEARCH_USERNAME = 'master';
-const OPENSEARCH_PASSWORD = 'f8#W!AuSj7Dze!';
+const OPENSEARCH_URL = 'https://2748nxgmdn832y3synoj.us-west-2.aoss.amazonaws.com';
 
+// Load credentials using AWS profile
+const loadSSOCredentials = async () => {
+  try {
+    const ssoCredentials = await fromSSO({ profile: 'NonProdDevPowerUserAccessPS_534874177660' })();
+    return ssoCredentials;
+  } catch (error) {
+    console.error('Error loading SSO credentials:', error);
+    throw error;
+  }
+};
+const credentials = loadSSOCredentials();
 const client = new Client({
   node: OPENSEARCH_URL,
-  auth: {
-    username: OPENSEARCH_USERNAME,
-    password: OPENSEARCH_PASSWORD,
-  },
+  ...AwsSigv4Signer({
+    region: 'us-west-2',
+    service: 'aoss',
+    getCredentials: () => Promise.resolve(credentials),
+  }),
 });
-
 export class GetOrderAction {
   async execute(
     pointer: string,
@@ -31,8 +42,31 @@ export class GetOrderAction {
     groupByField?: string,
     chaseId?: string,
 
-  ): Promise<{ response: object; pointer: number; count?: number; total?: number; }> {
+  ): Promise<{ response: object; pointer: number; count?: number; total?: number; }> { //
     try {
+
+      try {
+       
+    
+        // Sample function to test the client connection
+        const testConnection = async () => {
+          try {
+            const response = await client.ping();
+            console.log('Connected to OpenSearch:', response);
+          } catch (error) {
+            console.error('Error connecting to OpenSearch:', error);
+          }
+        };
+    
+        await testConnection();
+    
+        // Rest of your GetOrderAction code...
+      } catch (error) {
+        console.error('Error initializing OpenSearch client:', error);
+      }
+
+
+
       const must: any[] = [];
       const filter: any[] = [];
       
@@ -68,7 +102,7 @@ export class GetOrderAction {
             }
           });
         }
-  
+      
         if (must.length > 0 || filter.length > 0) {
           query.query = {
             bool: {}
@@ -173,7 +207,7 @@ export class GetOrderAction {
       console.log("Constructed Search Query:", JSON.stringify(query, null, 2));
 
       const response = await client.search({
-        index: 'new_orders_v3',
+        index: 'orders',
         body: query,
       });
 
