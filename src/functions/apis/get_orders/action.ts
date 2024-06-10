@@ -5,6 +5,7 @@ import { AwsSigv4Signer } from '@opensearch-project/opensearch/aws';
 import { fromSSO } from '@aws-sdk/credential-provider-sso';
 
 let client: Client;
+let INDEX: string;
 if (process.env.STAGE === 'dev') {
     const OPENSEARCH_URL = 'https://search-datahub-sandbox-vlcytbmhugnp2a6yoegu4mfhde.us-west-2.es.amazonaws.com';
     const OPENSEARCH_USERNAME = 'master';
@@ -16,6 +17,7 @@ if (process.env.STAGE === 'dev') {
             password: OPENSEARCH_PASSWORD,
         },
     });
+    INDEX = 'new_orders_v3';
 } else {
     const OPENSEARCH_URL = 'https://2748nxgmdn832y3synoj.us-west-2.aoss.amazonaws.com';
     //TODO: load credentials using lambda
@@ -39,6 +41,7 @@ if (process.env.STAGE === 'dev') {
             getCredentials: () => Promise.resolve(credentials),
         }),
     });
+    INDEX = 'orders';
 }
 
 export class GetOrderAction {
@@ -105,7 +108,7 @@ export class GetOrderAction {
             }
 
             const response = await client.search({
-                index: 'orders',
+                index: INDEX,
                 body: query,
             });
 
