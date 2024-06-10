@@ -1,4 +1,3 @@
-
 import { Responses } from './responses';
 import { GetOrderAction } from './action';
 import { APIHttpResponse } from '../../../libs/Contracts/APIHttpResponse';
@@ -6,16 +5,13 @@ import { HttpResponse } from '../../../libs/Contracts/HttpResponse';
 import { ApiGatewayEvent } from '../../../libs/Contracts/ApiGatewayEvent';
 import { API_RESPONSE, THROW_API_ERROR } from '../../../libs/Response';
 
-
 export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> {
     try {
-
         /**
          * Use this validate if validating an object from event.body
          * const request: GetOrderRequest = Validate(JSON.parse(event.body));
          */
-        
-       
+
         //for database connnections
         const action = new GetOrderAction();
         const workOrderId = event.queryStringParameters?.workOrderId ?? '';
@@ -33,22 +29,22 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
         const age = event.queryStringParameters?.age ?? '';
         const groupByField = event.queryStringParameters?.groupByField ?? '';
         const chaseId = event.queryStringParameters?.chaseId ?? '';
-        
+
         const data = await action.execute(
             pointer,
             limit,
             age,
-            decodedWorkOrderId, 
-            memberId, 
-            firstName, 
-            lastName, 
-            bulkOrderId, 
-            projectId, 
-            projectName, 
-            tenantId, 
-            resourceType, 
+            decodedWorkOrderId,
+            memberId,
+            firstName,
+            lastName,
+            bulkOrderId,
+            projectId,
+            projectName,
+            tenantId,
+            resourceType,
             groupByField,
-            chaseId
+            chaseId,
         );
 
         return API_RESPONSE({
@@ -57,5 +53,5 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
         });
     } catch (error) {
         return THROW_API_ERROR(error as HttpResponse);
-    } 
+    }
 }
