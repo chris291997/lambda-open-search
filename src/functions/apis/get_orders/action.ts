@@ -4,27 +4,42 @@ import { Client } from '@opensearch-project/opensearch';
 import { AwsSigv4Signer } from '@opensearch-project/opensearch/aws';
 import { fromSSO } from '@aws-sdk/credential-provider-sso';
 
-const OPENSEARCH_URL = 'https://2748nxgmdn832y3synoj.us-west-2.aoss.amazonaws.com';
+let client: Client;
+if (process.env.STAGE === 'dev') {
+    const OPENSEARCH_URL = 'https://search-datahub-sandbox-vlcytbmhugnp2a6yoegu4mfhde.us-west-2.es.amazonaws.com';
+    const OPENSEARCH_USERNAME = 'master';
+    const OPENSEARCH_PASSWORD = 'f8#W!AuSj7Dze!';
+    client = new Client({
+        node: OPENSEARCH_URL,
+        auth: {
+            username: OPENSEARCH_USERNAME,
+            password: OPENSEARCH_PASSWORD,
+        },
+    });
+} else {
+    const OPENSEARCH_URL = 'https://2748nxgmdn832y3synoj.us-west-2.aoss.amazonaws.com';
+    //TODO: load credentials using lambda
 
-// Load credentials using AWS profile
-const loadSSOCredentials = async () => {
-    try {
-        const ssoCredentials = await fromSSO({ profile: 'NonProdDevPowerUserAccessPS_534874177660' })();
-        return ssoCredentials;
-    } catch (error) {
-        console.error('Error loading SSO credentials:', error);
-        throw error;
-    }
-};
-const credentials = loadSSOCredentials();
-const client = new Client({
-    node: OPENSEARCH_URL,
-    ...AwsSigv4Signer({
-        region: 'us-west-2',
-        service: 'aoss',
-        getCredentials: () => Promise.resolve(credentials),
-    }),
-});
+    // Load credentials using AWS profile
+    const loadSSOCredentials = async () => {
+        try {
+            const ssoCredentials = await fromSSO({ profile: 'NonProdDevPowerUserAccessPS_534874177660' })();
+            return ssoCredentials;
+        } catch (error) {
+            console.error('Error loading SSO credentials:', error);
+            throw error;
+        }
+    };
+    const credentials = loadSSOCredentials();
+    client = new Client({
+        node: OPENSEARCH_URL,
+        ...AwsSigv4Signer({
+            region: 'us-west-2',
+            service: 'aoss',
+            getCredentials: () => Promise.resolve(credentials),
+        }),
+    });
+}
 
 export class GetOrderAction {
     async execute(
