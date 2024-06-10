@@ -178,9 +178,9 @@ export class GetOrderAction {
                             terms: {
                                 script: {
                                     source: `
-                    def tin = doc.containsKey('practitioner.tin') && doc['practitioner.tin'].size() > 0 ? doc['practitioner.tin'].value : null;
-                    return tin;
-                  `,
+                                      def tin = doc.containsKey('practitioner.tin') && doc['practitioner.tin'].size() > 0 ? doc['practitioner.tin'].value : (doc.containsKey('originalPractitioner.tin') && doc['originalPractitioner.tin'].size() > 0 ? doc['originalPractitioner.tin'].value : null);
+                                      return tin;
+                                    `,
                                     lang: 'painless',
                                 },
                                 order: {
@@ -224,7 +224,7 @@ export class GetOrderAction {
                             const tin = source.practitioner?.tin ?? source.originalPractitioner?.tin ?? '';
                             const orgUnitName = source.orgUnitName ?? '';
                             const projectName = source.projectName ?? '';
-
+                            const projectId = source.projectId ?? '';
                             let providerName;
                             let providerId;
 
@@ -239,9 +239,11 @@ export class GetOrderAction {
                             return {
                                 tin,
                                 doctorId,
+                                facility: providerName,
                                 providerId,
                                 providerName,
                                 orgUnitName,
+                                projectId,
                                 projectName,
                                 docCount: bucket.doc_count,
                             };
@@ -252,18 +254,22 @@ export class GetOrderAction {
                         (bucket: { key: string; doc_count: number; top_hits: any }) => {
                             const source = bucket.top_hits.hits.hits[0]._source;
                             const orgUnitName = source.orgUnitName ?? '';
-                            const provider = bucket.top_hits.hits.hits[0]._source.providerProfile;
+                            const provider = source.providerProfile;
                             const identifiers = source.identifiers;
                             const doctorIdObject = identifiers.find(
                                 (identifier: { type: string }) => identifier.type === 'doctorId',
                             );
                             const doctorId = doctorIdObject ? doctorIdObject.value : null;
                             const tin = source.practitioner?.tin ?? source.originalPractitioner?.tin ?? '';
+                            const projectId = source.projectId ?? '';
+
                             return {
                                 tin,
                                 doctorId,
+                                facility: provider.name,
                                 providerId: provider.id,
                                 providerName: provider.name,
+                                projectId,
                                 projectName: bucket.key,
                                 orgUnitName,
                                 docCount: bucket.doc_count,
@@ -279,17 +285,18 @@ export class GetOrderAction {
                                 (identifier: { type: string }) => identifier.type === 'doctorId',
                             );
                             const doctorId = doctorIdObject ? doctorIdObject.value : null;
-                            const provider = bucket.top_hits.hits.hits[0]._source.providerProfile;
+                            const provider = source.providerProfile;
                             const projectName = source.projectName ?? '';
                             const orgUnitName = source.orgUnitName ?? '';
-
-                            console.log(doctorId);
+                            const projectId = source.projectId ?? '';
                             return {
                                 tin: bucket.key,
                                 doctorId,
+                                facility: provider.name,
                                 providerId: provider.id,
                                 providerName: provider.name,
                                 projectName,
+                                projectId,
                                 orgUnitName,
                                 docCount: bucket.doc_count,
                             };
