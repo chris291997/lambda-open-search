@@ -178,7 +178,8 @@ export class GetOrderAction {
                             terms: {
                                 script: {
                                     source: `
-                                      def tin = doc.containsKey('practitioner.tin') && doc['practitioner.tin'].size() > 0 ? doc['practitioner.tin'].value : (doc.containsKey('originalPractitioner.tin') && doc['originalPractitioner.tin'].size() > 0 ? doc['originalPractitioner.tin'].value : null);
+                                    def tin = doc.containsKey('practitioner.tin') && doc['practitioner.tin'].size() > 0 ? doc['practitioner.tin'].value : null;
+                                     // def tin = doc.containsKey('practitioner.tin') && doc['practitioner.tin'].size() > 0 ? doc['practitioner.tin'].value : (doc.containsKey('originalPractitioner.tin') && doc['originalPractitioner.tin'].size() > 0 ? doc['originalPractitioner.tin'].value : null);
                                       return tin;
                                     `,
                                     lang: 'painless',
