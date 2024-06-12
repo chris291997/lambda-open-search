@@ -5,6 +5,8 @@ grouped_orders_list:
         path: grouped_orders/list
         method: get
         cors: true
+        headers:
+          - "usergroup" 
   
         # authorizer: ${self:custom.ACCESS_TOKEN_AUTHORIZE}
   description: display a test item from orders
