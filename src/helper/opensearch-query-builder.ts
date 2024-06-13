@@ -57,7 +57,6 @@ export class OpenSearchQueryBuilder {
               order: {
                 _key: 'asc',
               },
-              size: limitNumber * pageNumber,
             },
             aggs: {
               top_hits: {
@@ -107,6 +106,7 @@ export class OpenSearchQueryBuilder {
               order: {
                 _key: 'asc',
               },
+              size: limitNumber * pageNumber,
             },
             aggs: {
               top_hits: {
