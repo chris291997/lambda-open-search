@@ -1,24 +1,18 @@
-
 import { Responses } from './responses';
 import { GetOrderAction } from './action';
 import { APIHttpResponse } from '../../../libs/Contracts/APIHttpResponse';
 import { HttpResponse } from '../../../libs/Contracts/HttpResponse';
 import { ApiGatewayEvent } from '../../../libs/Contracts/ApiGatewayEvent';
 import { API_RESPONSE, THROW_API_ERROR } from '../../../libs/Response';
-import { GetOrderRequest } from './request';
-import Validate from './validate';
-
+import { OpenSearchClientService } from '../../../services/opensearch-client-service';
+import { OpenSearchQueryBuilder } from '../../../helper/opensearch-query-builder';
 
 export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> {
     try {
+        const clientService = OpenSearchClientService.getInstance();
+        const queryBuilder = new OpenSearchQueryBuilder();
+        const action = new GetOrderAction(clientService, queryBuilder);
 
-        /**
-         * Use this validate if validating an object from event.body
-         * const request: GetOrderRequest = Validate(JSON.parse(event.body));
-         */
-       
-        //for database connnections
-        const action = new GetOrderAction();
         const workOrderId = event.queryStringParameters?.workOrderId ?? '';
         const decodedWorkOrderId = decodeURIComponent(workOrderId);
         const memberId = event.queryStringParameters?.memberId ?? '';
@@ -33,20 +27,20 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
         const limit = event.queryStringParameters?.limit ?? '';
         const age = event.queryStringParameters?.age ?? '';
         const chaseId = event.queryStringParameters?.chaseId ?? '';
-        
+
         const data = await action.execute(
             pointer,
             limit,
             age,
-            decodedWorkOrderId, 
-            memberId, 
-            firstName, 
-            lastName, 
-            bulkOrderId, 
-            projectId, 
-            projectName, 
-            tenantId, 
-            resourceType, 
+            decodedWorkOrderId,
+            memberId,
+            firstName,
+            lastName,
+            bulkOrderId,
+            projectId,
+            projectName,
+            tenantId,
+            resourceType,
             chaseId,
         );
 
@@ -56,5 +50,5 @@ export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> 
         });
     } catch (error) {
         return THROW_API_ERROR(error as HttpResponse);
-    } 
+    }
 }

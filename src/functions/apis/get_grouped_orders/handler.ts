@@ -1,19 +1,18 @@
-import { Responses } from './responses';
-import { GetOrderAction } from './action';
+import { GetGroupedOrdersAction } from './action';
 import { APIHttpResponse } from '../../../libs/Contracts/APIHttpResponse';
 import { HttpResponse } from '../../../libs/Contracts/HttpResponse';
 import { ApiGatewayEvent } from '../../../libs/Contracts/ApiGatewayEvent';
 import { API_RESPONSE, THROW_API_ERROR } from '../../../libs/Response';
+import { Responses } from './responses';
+import { OpenSearchClientService } from '../../../services/opensearch-client-service';
+import { OpenSearchQueryBuilder } from '../../../helper/opensearch-query-builder';
 
 export async function execute(event: ApiGatewayEvent): Promise<APIHttpResponse> {
     try {
-        /**
-         * Use this validate if validating an object from event.body
-         * const request: GetOrderRequest = Validate(JSON.parse(event.body));
-         */
+        const clientService = OpenSearchClientService.getInstance();
+        const queryBuilder = new OpenSearchQueryBuilder();
+        const action = new GetGroupedOrdersAction(clientService, queryBuilder);
 
-        //for database connnections
-        const action = new GetOrderAction();
         const workOrderId = event.queryStringParameters?.workOrderId ?? '';
         const decodedWorkOrderId = decodeURIComponent(workOrderId);
         const memberId = event.queryStringParameters?.memberId ?? '';

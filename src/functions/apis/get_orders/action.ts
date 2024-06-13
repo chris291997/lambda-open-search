@@ -1,50 +1,17 @@
 import moment from 'moment-timezone';
-import { ChasesMapper } from './adaptor/chase-mapper';
-import { Client } from '@opensearch-project/opensearch';
-import { AwsSigv4Signer } from '@opensearch-project/opensearch/aws';
-import { fromSSO } from '@aws-sdk/credential-provider-sso';
-
-let client: Client;
-let INDEX: string;
-if (process.env.STAGE === 'dev') {
-    const OPENSEARCH_URL = 'https://search-datahub-sandbox-vlcytbmhugnp2a6yoegu4mfhde.us-west-2.es.amazonaws.com';
-    const OPENSEARCH_USERNAME = 'master';
-    const OPENSEARCH_PASSWORD = 'f8#W!AuSj7Dze!';
-    client = new Client({
-        node: OPENSEARCH_URL,
-        auth: {
-            username: OPENSEARCH_USERNAME,
-            password: OPENSEARCH_PASSWORD,
-        },
-    });
-    INDEX = 'new_orders_v3';
-} else {
-    const OPENSEARCH_URL = 'https://2748nxgmdn832y3synoj.us-west-2.aoss.amazonaws.com';
-    //TODO: load credentials using lambda
-
-    // Load credentials using AWS profile
-    const loadSSOCredentials = async () => {
-        try {
-            const ssoCredentials = await fromSSO({ profile: 'NonProdDevPowerUserAccessPS_534874177660' })();
-            return ssoCredentials;
-        } catch (error) {
-            console.error('Error loading SSO credentials:', error);
-            throw error;
-        }
-    };
-    const credentials = loadSSOCredentials();
-    client = new Client({
-        node: OPENSEARCH_URL,
-        ...AwsSigv4Signer({
-            region: 'us-west-2',
-            service: 'aoss',
-            getCredentials: () => Promise.resolve(credentials),
-        }),
-    });
-    INDEX = 'orders';
-}
+import { OpenSearchClientService } from '../../../services/opensearch-client-service';
+import { ChasesMapper } from './adaptor/mappers/chase-mapper';
+import { OpenSearchQueryBuilder } from '../../../helper/opensearch-query-builder';
 
 export class GetOrderAction {
+    private clientService: OpenSearchClientService;
+    private queryBuilder: OpenSearchQueryBuilder;
+
+    constructor(clientService: OpenSearchClientService, queryBuilder: OpenSearchQueryBuilder) {
+        this.clientService = clientService;
+        this.queryBuilder = queryBuilder;
+    }
+
     async execute(
         pointer: string,
         limit: string,
@@ -65,47 +32,32 @@ export class GetOrderAction {
             const days = Number(age);
             const limitNumber = Number(limit);
 
-            const must: any[] = [];
-            const filter: any[] = [];
-            if (workOrderId) must.push({ term: { _id: workOrderId } });
-            if (chaseId) must.push({ term: { id: chaseId } });
-            if (bulkOrderId) must.push({ match: { bulkOrderId: bulkOrderId } });
-            if (projectId) must.push({ match: { projectId: projectId } });
-            if (tenantId) must.push({ match: { tenantId: tenantId } });
+            const client = this.clientService.getClient();
+            const INDEX = this.clientService.getIndex();
 
-            if (projectName) filter.push({ match: { projectName: projectName } });
-            if (resourceType) filter.push({ match: { type: resourceType } });
-            if (firstName) filter.push({ match: { 'patient.firstName': firstName } });
-            if (lastName) filter.push({ match: { 'patient.lastName': lastName } });
-            if (memberId) filter.push({ match: { 'patient.memberId': memberId } });
+            if (workOrderId) this.queryBuilder.addMustTerm('_id', workOrderId);
+            if (chaseId) this.queryBuilder.addMustTerm('id', chaseId);
+
+            if (bulkOrderId) this.queryBuilder.addMustMatch('bulkOrderId', bulkOrderId);
+            if (projectId) this.queryBuilder.addMustMatch('projectId', projectId);
+            if (tenantId) this.queryBuilder.addMustMatch('tenantId', tenantId);
+
+            if (projectName) this.queryBuilder.addFilterMatch('projectName', projectName);
+            if (resourceType) this.queryBuilder.addFilterMatch('type', resourceType);
+            if (firstName) this.queryBuilder.addFilterMatch('patient.firstName', firstName);
+            if (lastName) this.queryBuilder.addFilterMatch('patient.lastName', lastName);
+            if (memberId) this.queryBuilder.addFilterMatch('patient.memberId', memberId);
 
             if (days !== 0) {
-                const dateThreshold = moment().subtract(age, 'days').toISOString();
-                filter.push({
-                    range: {
-                        createDateTime: {
-                            gte: dateThreshold,
-                        },
-                    },
-                });
+                const dateThreshold = moment().subtract(days, 'days').toISOString();
+                this.queryBuilder.addFilterRange('createDateTime', dateThreshold);
             }
 
-            const query: any = {
-                size: pageNumber * limitNumber,
-                from: (pageNumber - 1) * limitNumber,
-                sort: [{ id: 'asc' }], // Sorting by id.keyword in ascending order
-            };
-
-            if (must.length > 0 || filter.length > 0) {
-                query.query = {
-                    bool: {
-                        must,
-                        filter,
-                    },
-                };
-            } else {
-                query.query = { match_all: {} };
-            }
+            const query = this.queryBuilder
+                .setSize(limitNumber)
+                .setFrom((pageNumber - 1) * limitNumber)
+                .setSort('providerProfile.name', 'asc')
+                .build();
 
             const response = await client.search({
                 index: INDEX,
@@ -125,6 +77,7 @@ export class GetOrderAction {
             if (missingIds.length > 0) {
                 console.warn(`${missingIds.length} document(s) found with missing id.`);
             }
+
             // Map the response data to ChaseExcerptV2 objects
             const mappedResponse = ChasesMapper.mapArray(data);
 

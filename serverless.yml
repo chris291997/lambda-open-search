@@ -88,9 +88,6 @@ package:
     - '!.prettierrc' # Exclude Prettier configuration
     - '!buildspec.yml' # Exclude buildspec.yml
     - '!docker-compose.yml' # Exclude docker-compose.yml
-httpApi:
-  type: aws
-  cors: true
   
 functions: ${file(./src/functions/apis/apiHandler.yml)}
 

@@ -1,4 +1,4 @@
-import { ChaseExcerptV2 } from './dto/ChaseExcerptV2';
+import { ChaseExcerptV2 } from '../dto/ChaseExcerptV2';
 
 export class ChasesMapper {
     static map(data: any): ChaseExcerptV2 | undefined {
