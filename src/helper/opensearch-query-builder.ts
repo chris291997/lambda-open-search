@@ -74,8 +74,8 @@ export class OpenSearchQueryBuilder {
             terms: {
               script: {
                 source: `
-                  def projectName = doc.containsKey('projectName') && doc['projectName'].size() > 0 ? doc['projectName'].value : null;
-                  return projectName;
+                  def projectId = doc.containsKey('projectId') && doc['projectId'].size() > 0 ? doc['projectId'].value : null;
+                  return projectId;
                 `,
                 lang: 'painless',
               },
