@@ -164,7 +164,7 @@ export class GetGroupedOrdersAction {
             const tin = source.practitioner?.tin ?? source.originalPractitioner?.tin ?? '';
             const provider = source.providerProfile;
             const orgUnitName = source.orgUnitName ?? '';
-            const projectId = source.projectId ?? '';
+            const projectName = source.projectName ?? '';
 
             return {
                 tin,
@@ -172,8 +172,8 @@ export class GetGroupedOrdersAction {
                 facility: provider.name,
                 providerId: provider.id,
                 providerName: provider.name,
-                projectId,
-                projectName: bucket.key,
+                projectId : bucket.key,
+                projectName: projectName,
                 orgUnitName,
                 docCount: bucket.doc_count,
             };
