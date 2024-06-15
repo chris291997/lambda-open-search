@@ -1,5 +1,5 @@
 export enum GroupByFieldEnum {
-    PROVIDER = 'provider',
-    PROJECT = 'project',
+    PROVIDER = 'providergrouping',
+    PROJECT = 'projectid',
     TIN = 'tin',
 }

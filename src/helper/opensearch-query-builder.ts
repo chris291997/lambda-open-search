@@ -1,3 +1,5 @@
+import { GroupByFieldEnum } from "./groupByField-enum";
+
 export class OpenSearchQueryBuilder {
     private must: any[] = [];
     private filter: any[] = [];
@@ -41,7 +43,7 @@ export class OpenSearchQueryBuilder {
     public setAggregation(groupByField: string, limitNumber: number, pageNumber: number): OpenSearchQueryBuilder {
       this.query.size = 0;
   
-      if (groupByField === 'provider') {
+      if (groupByField === GroupByFieldEnum.PROVIDER) {
         this.query.aggs = {
           group_by_provider: {
             terms: {
@@ -68,7 +70,7 @@ export class OpenSearchQueryBuilder {
             },
           },
         };
-      } else if (groupByField === 'project') {
+      } else if (groupByField === GroupByFieldEnum.PROJECT) {
         this.query.aggs = {
           group_by_project: {
             terms: {
@@ -93,7 +95,7 @@ export class OpenSearchQueryBuilder {
             },
           },
         };
-      } else if (groupByField === 'tin') {
+      } else if (groupByField === GroupByFieldEnum.TIN) {
         this.query.aggs = {
           group_by_tin: {
             terms: {

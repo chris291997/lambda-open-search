@@ -3,6 +3,7 @@ import { ChasesMapper } from './adaptor/mappers/chase-mapper';
 import { OpenSearchClientService } from '../../../services/opensearch-client-service';
 import { OpenSearchQueryBuilder } from '../../../helper/opensearch-query-builder';
 import { GroupByFieldEnum } from '../../../helper/groupByField-enum';
+import { GroupedChasesMapper } from './adaptor/mappers/grouped-chase-excerpt-mapper';
 
 
 export class GetGroupedOrdersAction {
@@ -141,7 +142,7 @@ export class GetGroupedOrdersAction {
             const providerName = match ? match[1] : bucket.key;
             const providerId = match ? match[2] : null;
 
-            return {
+            const data = {
                 tin,
                 doctorId,
                 facility: providerName,
@@ -152,6 +153,7 @@ export class GetGroupedOrdersAction {
                 projectName,
                 docCount: bucket.doc_count,
             };
+            return GroupedChasesMapper.map(data);
         });
     }
 
@@ -166,7 +168,7 @@ export class GetGroupedOrdersAction {
             const orgUnitName = source.orgUnitName ?? '';
             const projectName = source.projectName ?? '';
 
-            return {
+            const data = {
                 tin,
                 doctorId,
                 facility: provider.name,
@@ -177,6 +179,7 @@ export class GetGroupedOrdersAction {
                 orgUnitName,
                 docCount: bucket.doc_count,
             };
+            return GroupedChasesMapper.map(data);
         });
     }
 
@@ -191,7 +194,7 @@ export class GetGroupedOrdersAction {
             const orgUnitName = source.orgUnitName ?? '';
             const projectId = source.projectId ?? '';
 
-            return {
+            const data = {
                 tin: bucket.key,
                 doctorId,
                 facility: provider.name,
@@ -202,6 +205,7 @@ export class GetGroupedOrdersAction {
                 orgUnitName,
                 docCount: bucket.doc_count,
             };
+            return GroupedChasesMapper.map(data);
         });
     }
 }
